@@ -23,7 +23,7 @@ const games: Game[] = [
   { name: "Retro Bowl", url: "https://retrobowl.me/", description: "Retro football management" },
   { name: "Slope", url: "https://slopegame.io/", description: "Roll down the slope" },
   { name: "Snake", url: "https://playsnake.org/", description: "Classic snake game" },
-  { name: "Subway Surfers", url: "https://subwaysurf.io/", description: "Endless runner" },
+  { name: "Subway Surfers", url: "https://padlet-uploads-usc1.storage.googleapis.com/4369598499/7862e21c34161feeaed746c416f83c09/clSINGLEFILE.html", description: "Endless runner (HTML version)" },
   { name: "Tetris", url: "https://tetris.com/play-tetris", description: "Classic block puzzle" },
   { name: "Wordle", url: "https://www.nytimes.com/games/wordle/", description: "Daily word puzzle" },
   { name: "Zombs Royale", url: "https://zombsroyale.io/", description: "Battle royale .io game" },
