@@ -29,6 +29,16 @@ const games: Game[] = [
   { name: "Zombs Royale", url: "https://zombsroyale.io/", description: "Battle royale .io game" },
 ];
 
+const openInBlank = (url: string) => {
+  const win = window.open("about:blank", "_blank");
+  if (win) {
+    win.document.write(
+      `<!DOCTYPE html><html><head><title>Document</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
+    );
+    win.document.close();
+  }
+};
+
 const HtmlGames = () => {
   return (
     <section id="html-games" className="py-16 px-4">
@@ -40,17 +50,15 @@ const HtmlGames = () => {
           </h2>
         </div>
         <p className="text-muted-foreground mb-6">
-          Curated HTML5 games sorted alphabetically. Click to deploy.
+          Curated HTML5 games sorted alphabetically. Opens in about:blank for privacy.
         </p>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {games.map((game) => (
-            <a
+            <button
               key={game.name}
-              href={game.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nuke-card rounded-lg p-4 flex items-start justify-between group cursor-pointer"
+              onClick={() => openInBlank(game.url)}
+              className="nuke-card rounded-lg p-4 flex items-start justify-between group cursor-pointer text-left"
             >
               <div>
                 <h3 className="text-foreground font-bold text-sm group-hover:text-primary transition-colors">
@@ -59,7 +67,7 @@ const HtmlGames = () => {
                 <p className="text-muted-foreground text-xs mt-1">{game.description}</p>
               </div>
               <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
-            </a>
+            </button>
           ))}
         </div>
       </div>
