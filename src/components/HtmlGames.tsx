@@ -32,10 +32,20 @@ const games: Game[] = [
 const openStealthy = (url: string) => {
   const win = window.open("about:blank", "_blank");
   if (win) {
-    win.document.write(
-      `<!DOCTYPE html><html><head><title>HTML Games</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
-    );
-    win.document.close();
+    fetch(url)
+      .then((res) => res.text())
+      .then((html) => {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+      })
+      .catch(() => {
+        // Fallback: if fetch fails due to CORS, use iframe
+        win.document.write(
+          `<!DOCTYPE html><html><head><title>HTML Games</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></body></html>`
+        );
+        win.document.close();
+      });
   }
 };
 
