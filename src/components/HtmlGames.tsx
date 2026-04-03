@@ -30,10 +30,10 @@ const games: Game[] = [
 ];
 
 const openStealthy = (url: string) => {
-  const win = window.open(window.location.origin + "/#", "_blank");
+  const win = window.open("about:blank", "_blank");
   if (win) {
     win.document.write(
-      `<!DOCTYPE html><html><head><title>${document.title}</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
+      `<!DOCTYPE html><html><head><title>HTML Games</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
     );
     win.document.close();
   }
