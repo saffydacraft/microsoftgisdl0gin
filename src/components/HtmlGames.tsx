@@ -57,7 +57,7 @@ const HtmlGames = () => {
           {games.map((game) => (
             <button
               key={game.name}
-              onClick={() => openInBlank(game.url)}
+              onClick={() => openStealthy(game.url)}
               className="nuke-card rounded-lg p-4 flex items-start justify-between group cursor-pointer text-left"
             >
               <div>
