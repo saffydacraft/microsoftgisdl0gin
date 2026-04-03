@@ -29,11 +29,11 @@ const games: Game[] = [
   { name: "Zombs Royale", url: "https://zombsroyale.io/", description: "Battle royale .io game" },
 ];
 
-const openInBlank = (url: string) => {
-  const win = window.open("about:blank", "_blank");
+const openStealthy = (url: string) => {
+  const win = window.open(window.location.origin + "/#", "_blank");
   if (win) {
     win.document.write(
-      `<!DOCTYPE html><html><head><title>Document</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
+      `<!DOCTYPE html><html><head><title>${document.title}</title><style>*{margin:0;padding:0}body{overflow:hidden}</style></head><body><iframe src="${url}" style="width:100vw;height:100vh;border:none"></iframe></body></html>`
     );
     win.document.close();
   }
