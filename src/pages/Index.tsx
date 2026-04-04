@@ -1,11 +1,11 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Radiation, ChevronDown } from "lucide-react";
 import nukeHero from "@/assets/nuke-hero.jpg";
+import PasswordGate from "@/components/PasswordGate";
 
 const ProxyGames = lazy(() => import("@/components/ProxyGames"));
 const GoogleResources = lazy(() => import("@/components/GoogleResources"));
 const HtmlGames = lazy(() => import("@/components/HtmlGames"));
-
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-12">
     <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
@@ -13,6 +13,10 @@ const SectionLoader = () => (
 );
 
 const Index = () => {
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("na_unlocked") === "1");
+
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+
   return (
     <div className="min-h-screen bg-background scan-overlay">
       <div className="hazard-stripe h-2" />
