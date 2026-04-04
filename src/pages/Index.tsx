@@ -13,6 +13,10 @@ const SectionLoader = () => (
 );
 
 const Index = () => {
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("na_unlocked") === "1");
+
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+
   return (
     <div className="min-h-screen bg-background scan-overlay">
       <div className="hazard-stripe h-2" />
