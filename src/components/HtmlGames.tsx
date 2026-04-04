@@ -52,6 +52,14 @@ const games: Game[] = [
   { id: "clsupermariobros", name: "Super Mario Bros" },
   { id: "cltetris", name: "Tetris" },
   { id: "clundertalelb", name: "Undertale" },
+  { id: "clvexthree", name: "Vex 3" },
+  { id: "clvex4", name: "Vex 4" },
+  { id: "clvex5", name: "Vex 5" },
+  { id: "clwatergirl", name: "Watergirl and Fireboy" },
+  { id: "clworldshardestgame", name: "Worlds Hardest Game" },
+  { id: "clxtrmath", name: "Xtra Math Runner" },
+  { id: "clyohoho", name: "Yo Hoho" },
+  { id: "clzombsroyale", name: "Zombs Royale" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 // Group by first letter
