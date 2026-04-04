@@ -44,6 +44,7 @@ const games: Game[] = [
   { id: "clmonkeymart", name: "Monkey Mart" },
   { id: "clninjamuffin", name: "Ninja Muffin" },
   { id: "clore", name: "OvO" },
+  { id: "clqbert", name: "Q*bert" },
   { id: "clpacman", name: "Pac-Man" },
   { id: "clpizzatower", name: "Pizza Tower" },
   { id: "clretrobowl", name: "Retro Bowl" },
