@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { Gamepad2, ChevronDown, ChevronRight, X, AlertTriangle } from "lucide-react";
 
 interface Game {
-  id: string; // filename on jsdelivr (without .html)
+  id: string;
   name: string;
 }
 
@@ -75,7 +75,9 @@ const games: Game[] = [
   { id: "clzombsroyale", name: "Zombs Royale" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-// Group by first letter
+// Pre-compute index map and groups once
+const gameIndexMap = new Map(games.map((g, i) => [g.id, i + 1]));
+
 const groupedGames = games.reduce<Record<string, Game[]>>((acc, game) => {
   const letter = game.name[0].toUpperCase();
   if (!acc[letter]) acc[letter] = [];
@@ -91,31 +93,57 @@ const HtmlGames = () => {
   const [loading, setLoading] = useState(false);
   const [isPanicking, setIsPanicking] = useState(false);
   const [activeGame, setActiveGame] = useState<string | null>(null);
-  const [gameHtml, setGameHtml] = useState<string>("");
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
 
-  const toggleSection = (letter: string) => {
+  // Clean up blob URL on unmount or when changing games
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    };
+  }, []);
+
+  const cleanupBlob = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    setBlobUrl(null);
+  }, []);
+
+  const toggleSection = useCallback((letter: string) => {
     setOpenSections((prev) => ({ ...prev, [letter]: !prev[letter] }));
-  };
+  }, []);
 
-  const loadGame = async (game: Game) => {
+  const loadGame = useCallback(async (game: Game) => {
+    cleanupBlob();
     setLoading(true);
     setActiveGame(game.name);
     try {
-      const encoded = encodeURIComponent(game.id + ".html");
-      const res = await fetch(`${CDN_BASE}/${encoded}?t=${Date.now()}`);
+      const res = await fetch(`${CDN_BASE}/${encodeURIComponent(game.id + ".html")}?t=${Date.now()}`);
       const html = await res.text();
-      setGameHtml(html);
+      const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+      blobUrlRef.current = url;
+      setBlobUrl(url);
     } catch {
-      setGameHtml("<html><body style='color:white;background:#111;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif'><h1>Failed to load game. Try again.</h1></body></html>");
+      const errorHtml = "<html><body style='color:white;background:#111;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif'><h1>Failed to load. Try again.</h1></body></html>";
+      const url = URL.createObjectURL(new Blob([errorHtml], { type: "text/html" }));
+      blobUrlRef.current = url;
+      setBlobUrl(url);
     }
     setLoading(false);
-  };
+  }, [cleanupBlob]);
 
-  const handlePanic = () => {
+  const closeGame = useCallback(() => {
+    cleanupBlob();
+    setActiveGame(null);
+  }, [cleanupBlob]);
+
+  const handlePanic = useCallback(() => {
+    cleanupBlob();
     setIsPanicking(true);
     setActiveGame(null);
-    setGameHtml("");
-  };
+  }, [cleanupBlob]);
 
   if (isPanicking) {
     return (
@@ -136,27 +164,19 @@ const HtmlGames = () => {
   }
 
   if (activeGame) {
-    const blobUrl = URL.createObjectURL(new Blob([gameHtml], { type: "text/html" }));
     return (
       <section id="html-games" className="py-4 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <button
-              onClick={() => { setActiveGame(null); setGameHtml(""); }}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
-            >
-              <X className="w-4 h-4" /> Back to list
+            <button onClick={closeGame} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
+              <X className="w-4 h-4" /> Back
             </button>
             <span className="text-foreground font-bold text-sm">{activeGame}</span>
-            <button
-              onClick={handlePanic}
-              className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-opacity"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              PANIC
+            <button onClick={handlePanic} className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+              <AlertTriangle className="w-4 h-4" /> PANIC
             </button>
           </div>
-          {loading ? (
+          {loading || !blobUrl ? (
             <div className="flex items-center justify-center" style={{ height: "80vh" }}>
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
             </div>
@@ -179,14 +199,11 @@ const HtmlGames = () => {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Gamepad2 className="w-8 h-8 text-[hsl(var(--nuke-cyan))]" />
-          <h2 className="text-3xl font-bold text-[hsl(var(--nuke-cyan))]">
-            🎮 HTML GAMES [A-Z]
-          </h2>
+          <h2 className="text-3xl font-bold text-[hsl(var(--nuke-cyan))]">🎮 HTML GAMES [A-Z]</h2>
         </div>
         <p className="text-muted-foreground mb-6">
-          {games.length} games from Ultimate Game Stash. Click to play embedded — no new tabs, no blocked URLs.
+          {games.length} games. Click to play embedded — no new tabs, no blocked URLs.
         </p>
-
         <div className="space-y-1">
           {sortedLetters.map((letter) => (
             <div key={letter}>
@@ -194,22 +211,18 @@ const HtmlGames = () => {
                 onClick={() => toggleSection(letter)}
                 className="w-full flex items-center gap-2 py-2 px-3 text-foreground font-bold hover:bg-muted/30 rounded transition-colors text-left"
               >
-                {openSections[letter] ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
+                {openSections[letter] ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 {letter}
               </button>
               {openSections[letter] && (
                 <div className="ml-6 space-y-1 pb-2">
-                  {groupedGames[letter].map((game, i) => (
+                  {groupedGames[letter].map((game) => (
                     <button
                       key={game.id}
                       onClick={() => loadGame(game)}
                       className="block w-full text-left py-1.5 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/20 rounded transition-colors text-sm"
                     >
-                      math {games.indexOf(game) + 1} {game.name.toLowerCase()}
+                      math {gameIndexMap.get(game.id)} {game.name.toLowerCase()}
                     </button>
                   ))}
                 </div>
