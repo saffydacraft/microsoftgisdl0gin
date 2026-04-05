@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Radiation, ChevronDown } from "lucide-react";
 import nukeHero from "@/assets/nuke-hero.jpg";
+import FakeRestricted from "@/components/FakeRestricted";
 import PasswordGate from "@/components/PasswordGate";
 
 const ProxyGames = lazy(() => import("@/components/ProxyGames"));
@@ -13,8 +14,10 @@ const SectionLoader = () => (
 );
 
 const Index = () => {
+  const [bypassed, setBypassed] = useState(false);
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("na_unlocked") === "1");
 
+  if (!bypassed && !unlocked) return <FakeRestricted onBypass={() => setBypassed(true)} />;
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   return (
