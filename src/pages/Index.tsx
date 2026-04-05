@@ -14,8 +14,10 @@ const SectionLoader = () => (
 );
 
 const Index = () => {
+  const [bypassed, setBypassed] = useState(false);
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("na_unlocked") === "1");
 
+  if (!bypassed && !unlocked) return <FakeRestricted onBypass={() => setBypassed(true)} />;
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   return (
