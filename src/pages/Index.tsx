@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Radiation, ChevronDown } from "lucide-react";
 import nukeHero from "@/assets/nuke-hero.jpg";
+import FakeRestricted from "@/components/FakeRestricted";
 import PasswordGate from "@/components/PasswordGate";
 
 const ProxyGames = lazy(() => import("@/components/ProxyGames"));
